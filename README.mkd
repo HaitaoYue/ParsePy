@@ -32,7 +32,7 @@ Installation
 The easiest way to install this package is by downloading or
 cloning this repository:
 
-    pip install git+https://github.com/milesrichardson/ParsePy.git
+    pip install parse_client
 
 Note: The version on [PyPI](http://pypi.python.org/pypi) is not
 up-to-date. The code is still under lots of changes and the stability
@@ -537,6 +537,27 @@ removes all the related objects.
 scores = relation.query()
 for gamescore in scores:
     relation.remove(gamescore)
+~~~~~
+
+Pointers
+--------
+You can add point into object:
+
+~~~~~ {python}
+from parse_rest.datatypes import Object, Pointer
+
+score = Score(score=10)
+score.save()
+user = Person(name="hightall", score=Pointer(score))
+user.save()
+~~~~~
+
+And you can use inQuery for pointer query:
+
+~~~~~ {python}
+from parse_rest.datatypes import Object, Pointer
+
+users = Person(score__inQuery__score__lt=5)
 ~~~~~
 
 
