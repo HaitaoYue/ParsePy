@@ -15,7 +15,7 @@ class TestCommand(Command):
 
     def run(self):
         '''Run test suite in parse_rest.tests'''
-        tests = TestLoader().loadTestsFromNames(['parse_rest.tests'])
+        tests = TestLoader().loadTestsFromNames(['parse_client.tests'])
         t = TextTestRunner(verbosity=1)
         t.run(tests)
 
