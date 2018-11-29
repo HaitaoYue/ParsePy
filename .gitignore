@@ -11,3 +11,4 @@ parse_rest.egg-info
 *.egg-info/
 .installed.cfg
 *.egg
+.pypirc
