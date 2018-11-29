@@ -44,7 +44,8 @@ class Installation(ParseResource):
         installation_url = cls._get_installation_url(installation_id)
         current_config = cls.GET(installation_url)
 
-        new_channels = list(set(current_config['channels']).union(channels_to_add).difference(channels_to_remove))
+        new_channels = list(set(current_config['channels']).
+                            union(channels_to_add).difference(channels_to_remove))
 
         cls.PUT(installation_url, channels=new_channels)
 
@@ -70,5 +71,6 @@ class Push(ParseResource):
     @classmethod
     def message(cls, message, where=None, **kw):
         cls._send({'alert': message}, where=where, **kw)
+
 
 Installation.Query = QueryManager(Installation)

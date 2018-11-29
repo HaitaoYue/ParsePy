@@ -23,10 +23,12 @@ from parse_client.core import ParseError
 
 
 def complex_type(name=None):
-    '''Decorator for registering complex types'''
+    """Decorator for registering complex types"""
+
     def wrapped(cls):
         ParseType.type_mapping[name or cls.__name__] = cls
         return cls
+
     return wrapped
 
 
@@ -50,11 +52,12 @@ class ParseType(object):
             return parse_data
 
         native = ParseType.type_mapping.get(parse_type)
-        return  native.from_native(**parse_data) if native else parse_data
+        return native.from_native(**parse_data) if native else parse_data
 
     @staticmethod
     def convert_to_parse(python_object, as_pointer=False):
-        is_object = isinstance(python_object, ParseResource) #User is derived from ParseResouce not Object, check against ParseResource
+        is_object = isinstance(python_object,
+                               ParseResource)  # User is derived from ParseResouce not Object, check against ParseResource
 
         if is_object and not as_pointer:
             return dict([(k, ParseType.convert_to_parse(v, as_pointer=True))
@@ -70,15 +73,15 @@ class ParseType(object):
         }
 
         if (hasattr(python_object, '__iter__') and
-            not isinstance(python_object, (six.string_types[0], ParseType))):
+                not isinstance(python_object, (six.string_types[0], ParseType))):
             # It's an iterable? Repeat this whole process on each object
             if isinstance(python_object, dict):
                 for key, value in python_object.items():
-                    python_object[key]=ParseType.convert_to_parse(value, as_pointer=as_pointer)
+                    python_object[key] = ParseType.convert_to_parse(value, as_pointer=as_pointer)
                 return python_object
             else:
                 return [ParseType.convert_to_parse(o, as_pointer=as_pointer)
-                    for o in python_object]
+                        for o in python_object]
 
         if python_type in transformation_map:
             klass = transformation_map.get(python_type)
@@ -102,10 +105,10 @@ class Pointer(ParseType):
 
     @classmethod
     def from_native(cls, **kw):
-        # create object with only objectId and unloaded flag. it is automatically loaded when any other field is accessed
+        # create object with only objectId and unloaded flag.
+        # it is automatically loaded when any other field is accessed
         klass = Object.factory(kw.get('className'))
         return klass(objectId=kw.get('objectId'), _is_loaded=False)
-
 
     def __init__(self, obj):
         self._object = obj
@@ -172,9 +175,9 @@ class Relation(ParseType):
             className = self.parentObject.className
             objectId = self.parentObject.objectId
         repr = u'<Relation where %s:%s for %s>' % \
-            (className,
-             objectId,
-             self.relatedClassName)
+               (className,
+                objectId,
+                self.relatedClassName)
         return repr
 
     def _to_native(self):
@@ -255,9 +258,10 @@ class Date(ParseType):
             self._date = Date._from_str(date)
 
     def _to_native(self):
-        return {  #parse expects an iso8601 with 3 digits milliseonds and not 6
+        # parse expects an iso8601 with 3 digits milliseconds and not 6
+        return {
             '__type': 'Date', 'iso': '{0}Z'.format(self._date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3])
-            }
+        }
 
 
 @complex_type('Bytes')
@@ -290,7 +294,6 @@ class Array(ParseType):
         return self._elements
 
 
-
 @complex_type()
 class GeoPoint(ParseType):
 
@@ -307,7 +310,7 @@ class GeoPoint(ParseType):
             '__type': 'GeoPoint',
             'latitude': self.latitude,
             'longitude': self.longitude
-            }
+        }
 
 
 @complex_type()
@@ -422,6 +425,7 @@ class Function(ParseBase):
     def __call__(self, **kwargs):
         return self.POST('/' + self.name, **kwargs)
 
+
 class Job(ParseBase):
     ENDPOINT_ROOT = '/'.join((API_ROOT, 'jobs'))
 
@@ -433,7 +437,6 @@ class Job(ParseBase):
 
 
 class ParseResource(ParseBase):
-
     PROTECTED_ATTRIBUTES = ['objectId', 'createdAt', 'updatedAt']
 
     @property
@@ -451,7 +454,7 @@ class ParseResource(ParseBase):
         if not self.__dict__.get('_is_loaded', True):
             del self._is_loaded
             self._init_attrs(self.GET(self._absolute_url))
-        return object.__getattribute__(self, attr) #preserve default if attr not exists
+        return object.__getattribute__(self, attr)  # preserve default if attr not exists
 
     def _init_attrs(self, args):
         for key, value in six.iteritems(args):
@@ -463,7 +466,6 @@ class ParseResource(ParseBase):
 
     def _to_native(self):
         return ParseType.convert_to_parse(self)
-
 
     def _get_updated_datetime(self):
         return self.__dict__.get('_updated_at') and self._updated_at._date
@@ -530,8 +532,8 @@ class ParseResource(ParseBase):
 class ObjectMetaclass(type):
     def __new__(mcs, name, bases, dct):
         cls = super(ObjectMetaclass, mcs).__new__(mcs, name, bases, dct)
-        # attr check must be here because of specific six.with_metaclass implemetantion where metaclass is used also for
-        # internal NewBase which hasn't set_endpoint_root method
+        # attr check must be here because of specific six.with_metaclass implemetantion where
+        # metaclass is used also for internal NewBase which hasn't set_endpoint_root method
         if hasattr(cls, 'set_endpoint_root'):
             cls.set_endpoint_root()
             cls.Query = QueryManager(cls)
@@ -604,8 +606,8 @@ class Object(six.with_metaclass(ObjectMetaclass, ParseResource)):
             key: {
                 '__op': 'Increment',
                 'amount': amount
-                }
             }
+        }
         self.__class__.PUT(self._absolute_url, **payload)
         self.__dict__[key] += amount
 
@@ -617,8 +619,8 @@ class Object(six.with_metaclass(ObjectMetaclass, ParseResource)):
         payload = {
             key: {
                 '__op': 'Delete'
-                }
             }
+        }
         self.__class__.PUT(self._absolute_url, **payload)
         del self.__dict__[key]
 
@@ -630,17 +632,17 @@ class Object(six.with_metaclass(ObjectMetaclass, ParseResource)):
 
     def manageRelation(self, action, key, className, objectsId):
         objects = [{
-                    "__type": "Pointer",
-                    "className": className,
-                    "objectId": objectId
-                    } for objectId in objectsId]
+            "__type": "Pointer",
+            "className": className,
+            "objectId": objectId
+        } for objectId in objectsId]
 
         payload = {
             key: {
-                 "__op": action,
-                 "objects": objects
-                }
+                "__op": action,
+                "objects": objects
             }
+        }
         self.__class__.PUT(self._absolute_url, **payload)
 
     def relation(self, key):
@@ -655,8 +657,8 @@ class Object(six.with_metaclass(ObjectMetaclass, ParseResource)):
         payload = {
             key: {
                 '__op': 'Add', 'objects': objects
-                }
             }
+        }
         self.__class__.PUT(self._absolute_url, **payload)
         self.__dict__[key] = self.__dict__.get(key, []) + objects
 
@@ -664,8 +666,8 @@ class Object(six.with_metaclass(ObjectMetaclass, ParseResource)):
         payload = {
             key: {
                 '__op': 'AddUnique', 'objects': objects
-                }
             }
+        }
         self.__class__.PUT(self._absolute_url, **payload)
         data = self.__dict__.get(key, [])
         self.__dict__[key] = data + [x for x in objects if x not in data]
@@ -674,7 +676,7 @@ class Object(six.with_metaclass(ObjectMetaclass, ParseResource)):
         payload = {
             key: {
                 '__op': 'Remove', 'objects': objects
-                }
             }
+        }
         self.__class__.PUT(self._absolute_url, **payload)
         self.__dict__[key] = [x for x in self.__dict__.get(key, []) if x not in objects]

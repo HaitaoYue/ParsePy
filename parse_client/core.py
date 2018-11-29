@@ -13,28 +13,30 @@
 
 
 class ParseError(Exception):
-    '''Base exceptions from requests made to Parse'''
+    """Base exceptions from requests made to Parse"""
     pass
+
 
 class ParseBatchError(Exception):
-    ''' Error in batching operation... should take a list. '''
+    """ Error in batching operation... should take a list. """
     pass
 
+
 class ResourceRequestBadRequest(ParseError):
-    '''Request returns a 400'''
+    """Request returns a 400"""
     pass
 
 
 class ResourceRequestLoginRequired(ParseError):
-    '''Request returns a 401'''
+    """Request returns a 401"""
     pass
 
 
 class ResourceRequestForbidden(ParseError):
-    '''Request returns a 403'''
+    """Request returns a 403"""
     pass
 
 
 class ResourceRequestNotFound(ParseError):
-    '''Request returns a 404'''
+    """Request returns a 404"""
     pass

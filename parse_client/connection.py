@@ -25,7 +25,6 @@ API_ROOT = os.environ.get('PARSE_API_ROOT') or 'https://api.parse.com/1'
 
 ACCESS_KEYS = {}
 
-
 # Connection can sometimes hang forever on SSL handshake
 CONNECTION_TIMEOUT = 60
 
@@ -35,7 +34,7 @@ def register(app_id, rest_key, **kw):
     ACCESS_KEYS = {
         'app_id': app_id,
         'rest_key': rest_key
-        }
+    }
     ACCESS_KEYS.update(**kw)
 
 
@@ -64,16 +63,20 @@ class MasterKey:
 
 
 def master_key_required(func):
-    '''decorator describing methods that require the master key'''
+    """decorator describing methods that require the master key"""
+
     def ret(obj, *args, **kw):
         conn = ACCESS_KEYS
         if not (conn and conn.get('master_key')):
             message = '%s requires the master key' % func.__name__
             raise core.ParseError(message)
         func(obj, *args, **kw)
+
     return ret
 
-# Using this as "default=" argument solve the problem with Datetime object not being JSON serializable
+
+# Using this as "default=" argument solve the problem with Datetime object not being JSON
+# serializable
 def date_handler(obj):
     return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 
@@ -144,7 +147,7 @@ class ParseBase(object):
                 401: core.ResourceRequestLoginRequired,
                 403: core.ResourceRequestForbidden,
                 404: core.ResourceRequestNotFound
-                }.get(e.code, core.ParseError)
+            }.get(e.code, core.ParseError)
             raise exc(e.read())
 
         return json.loads(response.read().decode('utf-8'))
@@ -180,15 +183,16 @@ class ParseBatcher(ParseBase):
         Given a list of create, update or delete methods to call, call all
         of them in a single batch operation.
         """
-        methods = list(methods) # methods can be iterator
+        methods = list(methods)  # methods can be iterator
         if not methods:
-            #accepts also empty list (or generator) - it allows call batch directly with query result (eventually empty)
+            # accepts also empty list (or generator) - it allows call batch directly with query
+            # result (eventually empty)
             return
         queries, callbacks = list(zip(*[m(batch=True) for m in methods]))
         # perform all the operations in one batch
         responses = self.execute("", "POST", requests=queries)
         # perform the callbacks with the response data (updating the existing
-        # objets, etc)
+        # objects, etc)
 
         batched_errors = []
         for callback, response in zip(callbacks, responses):

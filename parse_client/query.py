@@ -63,9 +63,9 @@ class QueryManager(object):
 
 
 class Queryset(object):
-
     OPERATORS = [
-        'lt', 'lte', 'gt', 'gte', 'ne', 'in', 'nin', 'exists', 'select', 'dontSelect', 'all', 'regex', 'relatedTo', 'nearSphere'
+        'lt', 'lte', 'gt', 'gte', 'ne', 'in', 'nin', 'exists', 'select',
+        'dontSelect', 'all', 'regex', 'relatedTo', 'nearSphere', 'inQuery'
     ]
 
     @staticmethod
@@ -77,8 +77,10 @@ class Queryset(object):
     def extract_filter_operator(cls, parameter):
         for op in cls.OPERATORS:
             underscored = '__%s' % op
-            if parameter.endswith(underscored):
+            if 'inQuery' not in parameter and parameter.endswith(underscored):
                 return parameter[:-len(underscored)], op
+            elif op == 'inQuery' and op in parameter:
+                return parameter.split("__")[0], op
         return parameter, None
 
     def __init__(self, manager):
@@ -99,8 +101,8 @@ class Queryset(object):
         return iter(self._fetch())
 
     def __len__(self):
-        #don't use count query for len operator
-        #count doesn't return real size of result in all cases (eg if query contains skip option)
+        # don't use count query for len operator
+        # count doesn't return real size of result in all cases (eg if query contains skip option)
         return len(self._fetch())
 
     def __getitem__(self, key):
@@ -129,13 +131,35 @@ class Queryset(object):
 
     def filter(self, **kw):
         q = copy.deepcopy(self)
+        in_query_where = {}
         for name, value in kw.items():
             parse_value = Queryset.convert_to_parse(value)
             attr, operator = Queryset.extract_filter_operator(name)
+            if attr not in in_query_where:
+                in_query_where[attr] = {}
             if operator is None:
                 q._where[attr] = parse_value
             elif operator == 'relatedTo':
                 q._where['$' + operator] = {'object': parse_value, 'key': attr}
+            elif operator.startswith("inQuery"):
+                name_list = name.split("__")
+                name = "__".join(name_list[2:])
+                sub_attr, sub_operator = Queryset.extract_filter_operator(name)
+                if sub_operator is None:
+                    in_query_where[sub_attr] = parse_value
+                    in_query_where[attr].update({
+                        "%s" % sub_attr: parse_value
+                    })
+                else:
+                    in_query_where[attr].update({
+                        "%s" % sub_attr: {
+                            '$%s' % sub_operator: parse_value
+                        }
+                    })
+                q._where[attr]['$' + operator] = {
+                    "where": in_query_where[attr],
+                    "className": attr.capitalize()
+                }
             else:
                 if not isinstance(q._where[attr], dict):
                     q._where[attr] = {}
@@ -156,7 +180,7 @@ class Queryset(object):
         q = copy.deepcopy(self)
         q._options['keys'] = ','.join(fields)
         return q
-        
+
     def order_by(self, order, descending=False):
         q = copy.deepcopy(self)
         # add a minus sign before the order value if descending == True
@@ -178,12 +202,12 @@ class Queryset(object):
         results = self._fetch()
         if len(results) == 0:
             error_message = 'Query against %s returned no results' % (
-                    self._manager.model_class.ENDPOINT_ROOT)
+                self._manager.model_class.ENDPOINT_ROOT)
             raise QueryResourceDoesNotExist(error_message,
                                             status_code=404)
         if len(results) >= 2:
             error_message = 'Query against %s returned multiple results' % (
-                    self._manager.model_class.ENDPOINT_ROOT)
+                self._manager.model_class.ENDPOINT_ROOT)
             raise QueryResourceMultipleResultsReturned(error_message,
                                                        status_code=404)
         return results[0]

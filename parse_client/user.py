@@ -14,7 +14,7 @@
 
 from parse_client.core import ResourceRequestLoginRequired, ParseError
 from parse_client.connection import API_ROOT
-from parse_client.datatypes import ParseResource, ParseType
+from parse_client.datatypes import ParseResource, ParseType, Relation
 from parse_client.query import QueryManager
 
 
@@ -157,7 +157,6 @@ class User(ParseResource):
             return getattr(self, key).with_parent(parentObject=self, key=key)
         except:
             raise ParseError("Column '%s' is not a Relation." % (key,))
-
 
 
 User.Query = QueryManager(User)
