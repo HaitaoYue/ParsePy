@@ -8,3 +8,6 @@ dist
 MANIFEST
 global.json
 parse_rest.egg-info
+*.egg-info/
+.installed.cfg
+*.egg

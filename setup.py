@@ -21,15 +21,15 @@ class TestCommand(Command):
 
 
 setup(
-    name='parse_rest',
-    version='0.2.20170114',
+    name='parse_client',
+    version='0.1.0',
     description='A client library for Parse.com\'.s REST API',
-    url='https://github.com/milesrichardson/ParsePy',
-    packages=['parse_rest'],
-    package_data={"parse_rest": [os.path.join("cloudcode", "*", "*")]},
+    url='https://github.com/HaitaoYue/ParsePy',
+    packages=['parse_client'],
+    package_data={"parse_client": [os.path.join("cloudcode", "*", "*")]},
     install_requires=['six'],
-    maintainer='Miles Richardson',
-    maintainer_email='miles.richardson@gmail.com',
+    maintainer='Haitao Yue',
+    maintainer_email='hightallyht@gmail.com',
     cmdclass={'test': TestCommand},
     classifiers=[
         'Development Status :: 4 - Beta',

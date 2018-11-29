@@ -17,7 +17,7 @@ from six.moves.urllib.parse import urlencode, urlparse
 
 import json
 
-from parse_rest import core
+from parse_client import core
 
 import os
 

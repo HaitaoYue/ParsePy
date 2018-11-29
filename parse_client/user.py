@@ -12,10 +12,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from parse_rest.core import ResourceRequestLoginRequired, ParseError
-from parse_rest.connection import API_ROOT
-from parse_rest.datatypes import ParseResource, ParseType
-from parse_rest.query import QueryManager
+from parse_client.core import ResourceRequestLoginRequired, ParseError
+from parse_client.connection import API_ROOT
+from parse_client.datatypes import ParseResource, ParseType
+from parse_client.query import QueryManager
 
 
 def login_required(func):

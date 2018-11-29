@@ -14,12 +14,12 @@ import datetime
 import six
 from itertools import chain
 
-from parse_rest.core import ResourceRequestNotFound
-from parse_rest.connection import register, ParseBatcher, SessionToken, MasterKey
-from parse_rest.datatypes import GeoPoint, Object, Function, Pointer
-from parse_rest.user import User
-from parse_rest import query
-from parse_rest.installation import Push
+from parse_client.core import ResourceRequestNotFound
+from parse_client.connection import register, ParseBatcher, SessionToken, MasterKey
+from parse_client.datatypes import GeoPoint, Object, Function, Pointer
+from parse_client.user import User
+from parse_client import query
+from parse_client.installation import Push
 
 try:
     import settings_local
@@ -606,7 +606,7 @@ class TestSessionToken(unittest.TestCase):
     Test SessionToken class enter and exit.
     """
     def get_access_keys(self):
-        from parse_rest.connection import ACCESS_KEYS
+        from parse_client.connection import ACCESS_KEYS
         return ACCESS_KEYS
 
     def testWithSessionToken(self):
@@ -620,7 +620,7 @@ class TestMasterKey(unittest.TestCase):
     Test MasterKey class enter and exit.
     """
     def get_access_keys(self):
-        from parse_rest.connection import ACCESS_KEYS
+        from parse_client.connection import ACCESS_KEYS
         return ACCESS_KEYS
 
     def testWithMasterKey(self):
@@ -630,8 +630,8 @@ class TestMasterKey(unittest.TestCase):
 
 
 def run_tests():
-    """Run all tests in the parse_rest package"""
-    tests = unittest.TestLoader().loadTestsFromNames(['parse_rest.tests'])
+    """Run all tests in the parse_client package"""
+    tests = unittest.TestLoader().loadTestsFromNames(['parse_client.tests'])
     t = unittest.TextTestRunner(verbosity=1)
     t.run(tests)
 

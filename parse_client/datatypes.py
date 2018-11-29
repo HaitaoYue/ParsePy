@@ -17,9 +17,9 @@ import datetime
 import mimetypes
 import six
 
-from parse_rest.connection import API_ROOT, ParseBase
-from parse_rest.query import QueryManager
-from parse_rest.core import ParseError
+from parse_client.connection import API_ROOT, ParseBase
+from parse_client.query import QueryManager
+from parse_client.core import ParseError
 
 
 def complex_type(name=None):

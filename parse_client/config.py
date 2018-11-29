@@ -1,5 +1,5 @@
-from parse_rest.connection import API_ROOT
-from parse_rest.datatypes import ParseResource
+from parse_client.connection import API_ROOT
+from parse_client.datatypes import ParseResource
 
 
 class Config(ParseResource):

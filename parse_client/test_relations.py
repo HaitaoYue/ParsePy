@@ -14,14 +14,14 @@ import datetime
 import six
 from itertools import chain
 
-from parse_rest.core import ResourceRequestNotFound
-from parse_rest.core import ResourceRequestBadRequest
-from parse_rest.core import ParseError
-from parse_rest.connection import register, ParseBatcher
-from parse_rest.datatypes import GeoPoint, Object, Function, Pointer, Relation
-from parse_rest.user import User
-from parse_rest import query
-from parse_rest.installation import Push
+from parse_client.core import ResourceRequestNotFound
+from parse_client.core import ResourceRequestBadRequest
+from parse_client.core import ParseError
+from parse_client.connection import register, ParseBatcher
+from parse_client.datatypes import GeoPoint, Object, Function, Pointer, Relation
+from parse_client.user import User
+from parse_client import query
+from parse_client.installation import Push
 
 try:
     import settings_local
@@ -194,8 +194,8 @@ class TestRelation(unittest.TestCase):
 
 
 def run_tests():
-    """Run all tests in the parse_rest package"""
-    tests = unittest.TestLoader().loadTestsFromNames(['parse_rest.tests'])
+    """Run all tests in the parse_client package"""
+    tests = unittest.TestLoader().loadTestsFromNames(['parse_client.tests'])
     t = unittest.TextTestRunner(verbosity=1)
     t.run(tests)
 
