@@ -57,7 +57,8 @@ class ParseType(object):
     @staticmethod
     def convert_to_parse(python_object, as_pointer=False):
         is_object = isinstance(python_object,
-                               ParseResource)  # User is derived from ParseResouce not Object, check against ParseResource
+                               ParseResource)  # User is derived from ParseResource not Object,
+        # check against ParseResource
 
         if is_object and not as_pointer:
             return dict([(k, ParseType.convert_to_parse(v, as_pointer=True))
@@ -451,10 +452,17 @@ class ParseResource(ParseBase):
 
     def __getattr__(self, attr):
         # if object is not loaded and attribute is missing, try to load it
+        value = None
         if not self.__dict__.get('_is_loaded', True):
             del self._is_loaded
             self._init_attrs(self.GET(self._absolute_url))
-        return object.__getattribute__(self, attr)  # preserve default if attr not exists
+
+        try:
+            value = object.__getattribute__(self, attr)
+        except AttributeError:
+            pass
+
+        return value
 
     def _init_attrs(self, args):
         for key, value in six.iteritems(args):
@@ -532,7 +540,7 @@ class ParseResource(ParseBase):
 class ObjectMetaclass(type):
     def __new__(mcs, name, bases, dct):
         cls = super(ObjectMetaclass, mcs).__new__(mcs, name, bases, dct)
-        # attr check must be here because of specific six.with_metaclass implemetantion where
+        # attr check must be here because of specific six.with_metaclass implementation where
         # metaclass is used also for internal NewBase which hasn't set_endpoint_root method
         if hasattr(cls, 'set_endpoint_root'):
             cls.set_endpoint_root()
